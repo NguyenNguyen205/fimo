@@ -1,0 +1,14 @@
+version: '0'
+services:
+  cdn-service:
+    build: .
+    container_name: cnd-service
+    ports:
+      - 80:80
+    volumes:
+      # - type: bind
+      #   source: D:\personalProject\Fimo\storage\bucket_source
+      #   target:
+      - type: bind
+        source: D:\personalProject\Fimo\storage\bucket_destination
+        target: /var/videos
