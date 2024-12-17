@@ -12,10 +12,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.GroupSequence;
+import jakarta.websocket.server.PathParam;
 import net.minidev.json.JSONObject;
 import org.apache.coyote.Response;
 import org.hibernate.sql.Update;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
@@ -23,10 +26,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -59,11 +60,11 @@ public class UserController {
                     @Content(mediaType = "application/json")
             })
     })
-    @GetMapping("/")
-    public ResponseEntity getAllUsers() {
+    @GetMapping("")
+    public ResponseEntity getAllUsers(@RequestParam(required = false) Boolean isDeleted, @RequestParam(required = false) String fullname, @RequestParam(required = false) String tier, @RequestParam(required = false) @DateTimeFormat(pattern = "MM-dd-yyyy") Date fromDate) {
         List<UserResponseDTO> res = new ArrayList<>();
         try {
-            res = userService.getAllUsers();
+            res = userService.getAllUsers(isDeleted, fullname, tier, fromDate);
         } catch (Exception e) {
             HashMap<String, String> error = new HashMap<>();
             error.put("message", "Server error");

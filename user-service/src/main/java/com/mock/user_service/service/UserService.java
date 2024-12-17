@@ -7,7 +7,10 @@ import com.mock.user_service.model.IdempotencyKey;
 import com.mock.user_service.model.User;
 import com.mock.user_service.repository.IdempotencyKeyRepository;
 import com.mock.user_service.repository.UserRepository;
+import com.mock.user_service.repository.UserSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.JpaSort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -94,8 +97,22 @@ public class UserService {
         return userResponseDTO;
     }
 
-    public List<UserResponseDTO> getAllUsers() {
-        List<User> users = userRepository.findAll();
+    public List<UserResponseDTO> getAllUsers(Boolean isDeleted, String fullname, String tier, Date fromDate) {
+        Specification<User> spec = Specification.where(null);
+        if (isDeleted != null) {
+            spec = spec.and(UserSpecification.activeUser(isDeleted));
+        }
+        if (fullname != null) {
+            spec = spec.and(UserSpecification.findUsername(fullname));
+        }
+        if (tier != null) {
+            spec = spec.and(UserSpecification.findUsertier(tier));
+        }
+        if (fromDate != null) {
+            spec = spec.and(UserSpecification.findCreateDate(fromDate));
+        }
+        List<User> users = userRepository.findAll(spec);
+
         List<UserResponseDTO> userResponseDTOs = new ArrayList<>();
         for (User u : users) {
             userResponseDTOs.add(UserResponseDTO.builder()
